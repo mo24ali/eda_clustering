@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDA et Clustering - Présentation Complète</title>
+    <!-- Chart.js pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #212529;
+            --text-muted: #6c757d;
+            --primary: #0d6efd;
+            --border-color: #dee2e6;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            width: 90%;
+            max-width: 1200px;
+            height: 78vh;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 50px;
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            justify-content: flex-start;
+        }
+
+        .slide.active {
+            display: flex;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        p, li {
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            align-items: center;
+            height: 100%;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 260px;
+            width: 100%;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        button {
+            background-color: var(--text-main);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            font-size: 0.95rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary);
+        }
+
+        .slide-counter {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .box-info {
+            background: #f1f3f5;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation-container">
+
+    <!-- SLIDE 1 -->
+    <div class="slide active">
+        <div style="margin: auto; text-align: center;">
+            <h1 style="border: none; font-size: 2.6rem;">Analyse Exploratoire &amp; Clustering</h1>
+            <h2 style="margin-top: 15px;">Comprendre l'EDA et son rôle dans la segmentation des clients</h2>
+        </div>
+    </div>
+
+    <!-- SLIDE 2 -->
+    <div class="slide">
+        <h1>1. Introduction et Objectif Principal</h1>
+        <div class="content-grid">
+            <div>
+                <p><strong>Objectif Global :</strong> Comprendre comment l'analyse exploratoire des données (EDA) prépare le terrain pour une segmentation client rigoureuse.</p>
+                <p>Dans un marché concurrentiel, traiter tous les clients de la même manière est inefficace. La segmentation permet d'identifier des groupes homogènes aux comportements similaires.</p>
+            </div>
+            <div class="box-info">
+                <p style="font-weight: bold; color: var(--primary);">Points Clés de la Présentation :</p>
+                <ul>
+                    <li>Définition et buts du Clustering</li>
+                    <li>Rôle incontournable de l'EDA</li>
+                    <li>Prétraitement, Scaling &amp; K-Means</li>
+                    <li>Méthodes d'évaluation (Elbow &amp; Silhouette)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 3 -->
+    <div class="slide">
+        <h1>2. Qu'est-ce que le Clustering ?</h1>
+        <div class="content-grid">
+            <div>
+                <p>Le clustering est une technique d'<span class="highlight">apprentissage non supervisé</span> en Machine Learning.</p>
+                <p>Il consiste à regrouper un ensemble de données non étiquetées en sous-groupes (clusters) de telle sorte que les éléments d'un même groupe soient fortement similaires.</p>
+            </div>
+            <div class="box-info">
+                <p><strong>Exemple en Marketing :</strong></p>
+                <p>Séparer votre base de clients en :</p>
+                <ul>
+                    <li>Acheteurs VIP réguliers</li>
+                    <li>Chasseurs de promotions</li>
+                    <li>Clients occasionnels ou dormants</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 4 -->
+    <div class="slide">
+        <h1>3. Objectifs Stratégiques du Clustering</h1>
+        <div class="content-grid">
+            <div>
+                <p><strong>1. Personnalisation :</strong> Adapter les offres commerciales et les campagnes marketing par segment.</p>
+                <p><strong>2. Optimisation des ressources :</strong> Concentrer les efforts marketing sur les profils à forte valeur ajoutée.</p>
+                <p><strong>3. Découverte de profils cachés :</strong> Identifier des comportements d'achat atypiques non visibles à l'œil nu.</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="clusterGoalChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 5 -->
+    <div class="slide">
+        <h1>4. Le Rôle de l'EDA avant le Clustering</h1>
+        <div class="content-grid">
+            <div>
+                <p>L'Analyse Exploratoire des Données (EDA) est la boussole du data scientist avant de lancer tout algorithme.</p>
+                <p>Elle permet d'<span class="highlight">inspecter, nettoyer et comprendre</span> la structure profonde des données clients, évitant ainsi d'appliquer des modèles sur des bases biaisées.</p>
+            </div>
+            <div class="box-info">
+                <p style="font-style: italic;">"Garbage in, garbage out : un mauvais nettoyage des données mène inévitablement à des clusters aberrants."</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 6 -->
+    <div class="slide">
+        <h1>5. EDA : Distributions et Corrélations</h1>
+        <div class="content-grid">
+            <div>
+                <p><strong>Analyse des Distributions :</strong> Visualiser l'étalement des variables (ex: âge, dépenses) pour repérer les asymétries (skewness).</p>
+                <p><strong>Analyse des Corrélations :</strong> Détecter les liens linéaires forts entre variables (via une Heatmap) pour éliminer la redondance d'information.</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="edaDistChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 7 -->
+    <div class="slide">
+        <h1>6. EDA : Gestion des Valeurs Aberrantes</h1>
+        <div class="content-grid">
+            <div>
+                <p>Les <span class="highlight">outliers</span> (valeurs extrêmes, ex: un client ayant dépensé 100x la moyenne) impactent lourdement les algorithmes basés sur les distances.</p>
+                <p>Grâce aux boxplots de l'EDA, on identifie et traite ces anomalies avant la modélisation.</p>
+            </div>
+            <div class="box-info">
+                <p><strong>Actions possibles :</strong></p>
+                <ul>
+                    <li>Suppression si ce sont des erreurs de saisie</li>
+                    <li>Conservation ou transformation si ce sont de vrais profils VIP</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 8 -->
+    <div class="slide">
+        <h1>7. Sélection et Scaling des Variables</h1>
+        <div class="content-grid">
+            <div>
+                <p><strong>Sélection :</strong> Ne garder que les variables pertinentes pour la segmentation (ex: fréquence d'achat, montant, récence).</p>
+                <p><strong>Scaling (Standardisation) :</strong> Ramener toutes les variables sur la même échelle (moyenne=0, écart-type=1).</p>
+            </div>
+            <div class="box-info">
+                <p><strong>Pourquoi scaler ?</strong> Sans normalisation, une variable mesurée en milliers (ex: Revenu) écrasera une variable mesurée de 0 à 10 (ex: Score de satisfaction) dans le calcul de distance.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 9 -->
+    <div class="slide">
+        <h1>8. Principe de l'Algorithme K-Means</h1>
+        <div class="content-grid">
+            <div>
+                <p>K-Means est un algorithme itératif simple et puissant basé sur les distances euclidiennes.</p>
+                <ul>
+                    <li><strong>1. Initialisation :</strong> Placement aléatoire de $K$ centroïdes.</li>
+                    <li><strong>2. Assignation :</strong> Rattachement de chaque point au centroïde le plus proche.</li>
+                    <li><strong>3. Mise à jour :</strong> Recalcul de la position exacte du centre de chaque cluster.</li>
+                </ul>
+            </div>
+            <div class="chart-container">
+                <canvas id="kmeansSlideChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 10 -->
+    <div class="slide">
+        <h1>9. Choix du nombre de clusters : Méthode du Coude</h1>
+        <div class="content-grid">
+            <div>
+                <p>La <span class="highlight">Méthode du Coude (Elbow Method)</span> trace l'inertie (somme des distances intra-cluster) en fonction du nombre de $K$.</p>
+                <p>On cherche le point de rupture ("le coude") où l'ajout d'un cluster supplémentaire n'apporte plus de gain significatif en réduction d'erreur.</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="elbowSlideChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 11 -->
+    <div class="slide">
+        <h1>10. Choix du nombre de clusters : Score de Silhouette</h1>
+        <div class="content-grid">
+            <div>
+                <p>Le <span class="highlight">Score de Silhouette</span> évalue la qualité de la cohésion interne et de la séparation entre clusters.</p>
+                <p>Il varie de -1 à +1 :</p>
+                <ul>
+                    <li>Proche de +1 : Bon regroupement, net et séparé.</li>
+                    <li>Proche de 0 : Frontières floues entre clusters.</li>
+                </ul>
+            </div>
+            <div class="box-info">
+                <p><strong>Règle :</strong> On choisit généralement le $K$ qui maximise ce score moyen global.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 12 -->
+    <div class="slide">
+        <h1>11. Synthèse &amp; Conclusion</h1>
+        <div class="content-grid">
+            <div>
+                <p><strong>En résumé :</strong></p>
+                <ul>
+                    <li>L'<strong>EDA</strong> garantit la propreté et la compréhension des données.</li>
+                    <li>Le <strong>Scaling</strong> évite les déséquilibres numériques.</li>
+                    <li><strong>K-Means</strong> structure efficacement les segments clients.</li>
+                    <li><strong>Elbow &amp; Silhouette</strong> objectivent le choix de $K$.</li>
+                </ul>
+            </div>
+            <div style="text-align: center; margin: auto;">
+                <p style="font-size: 1.4rem; font-weight: bold; color: var(--primary);">Merci pour votre attention !</p>
+                <p style="margin-top: 15px; color: var(--text-muted);">Prêt pour la séance de questions/réponses.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contrôles de navigation -->
+    <div class="controls">
+        <button onclick="prevSlide()">Précédent</button>
+        <span class="slide-counter" id="counter">1 / 12</span>
+        <button onclick="nextSlide()">Suivant</button>
+    </div>
+
+</div>
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const counter = document.getElementById('counter');
+
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.classList.remove('active');
+            if (i === index) slide.classList.add('active');
+        });
+        counter.innerText = `${index + 1} / ${slides.length}`;
+    }
+
+    function nextSlide() {
+        if (currentSlide < slides.length - 1) {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlide > 0) {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+    }
+
+    // Navigation clavier
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') nextSlide();
+        if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    // --- GRAPHIQUES ---
+    // Slide 4 Chart
+    new Chart(document.getElementById('clusterGoalChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: ['VIP', 'Standard', 'Occasionnel'],
+            datasets: [{
+                data: [30, 50, 20],
+                backgroundColor: ['#0d6efd', '#6c757d', '#adb5bd']
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Slide 6 Chart
+    new Chart(document.getElementById('edaDistChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['18-25', '26-35', '36-45', '46-60', '60+'],
+            datasets: [{
+                label: 'Fréquence d\'achat',
+                data: [15, 45, 35, 20, 10],
+                backgroundColor: '#0d6efd'
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Slide 9 Chart
+    new Chart(document.getElementById('kmeansSlideChart').getContext('2d'), {
+        type: 'scatter',
+        data: {
+            datasets: [
+                { 
+                    label: 'Cluster 1 (VIP)', 
+                    data: [
+                        {x: 2.0, y: 3.1}, {x: 2.2, y: 2.9}, {x: 1.8, y: 3.4}, {x: 2.5, y: 3.0}, 
+                        {x: 2.1, y: 2.5}, {x: 1.9, y: 3.2}, {x: 2.3, y: 3.6}, {x: 2.4, y: 2.7},
+                        {x: 1.7, y: 3.0}, {x: 2.6, y: 3.3}, {x: 2.0, y: 2.8}, {x: 2.2, y: 3.5}
+                    ], 
+                    backgroundColor: '#0d6efd' 
+                },
+                { 
+                    label: 'Cluster 2 (Standard)', 
+                    data: [
+                        {x: 7.0, y: 8.1}, {x: 7.2, y: 7.8}, {x: 6.8, y: 8.4}, {x: 7.5, y: 8.0}, 
+                        {x: 7.1, y: 7.5}, {x: 6.9, y: 8.2}, {x: 7.3, y: 8.6}, {x: 7.4, y: 7.7},
+                        {x: 6.7, y: 7.9}, {x: 7.6, y: 8.3}, {x: 7.0, y: 8.0}, {x: 7.2, y: 7.6}
+                    ], 
+                    backgroundColor: '#6c757d' 
+                },
+                { 
+                    label: 'Cluster 3 (Occasionnel)', 
+                    data: [
+                        {x: 4.5, y: 1.2}, {x: 4.8, y: 1.5}, {x: 4.2, y: 1.0}, {x: 4.9, y: 1.3}, 
+                        {x: 4.4, y: 1.7}, {x: 4.7, y: 1.1}, {x: 4.3, y: 1.4}, {x: 4.6, y: 1.6},
+                        {x: 4.1, y: 1.2}, {x: 5.0, y: 1.5}, {x: 4.5, y: 1.1}, {x: 4.8, y: 1.8}
+                    ], 
+                    backgroundColor: '#adb5bd' 
+                }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Slide 10 Chart
+    new Chart(document.getElementById('elbowSlideChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: ['1', '2', '3', '4', '5', '6'],
+            datasets: [{ label: 'Inertie (WCSS)', data: [120, 80, 50, 25, 20, 18], borderColor: '#0d6efd', tension: 0.1 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+</script>
+
+</body>
+</html>
